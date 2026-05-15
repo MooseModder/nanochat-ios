@@ -1,1 +1,38 @@
-
+workflows:
+  ios-signulous-build:
+    name: Signulous Target IPA Build
+    instance_type: mac_mini_m1
+    max_build_duration: 30
+    environment:
+      xcode: 16.0  # Safe target SDK selection matching iOS 18 baseline
+      cocoapods: default
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: main
+    scripts:
+      - name: Resolve Project Dependencies
+        script: |
+          if [ -f "Podfile" ]; then
+            pod install
+          fi
+      - name: Build Unsigned Target Archive
+        script: |
+          xcodebuild archive \
+            -workspace "NanoChatApp.xcworkspace" \
+            -scheme "NanoChatApp" \
+            -configuration Release \
+            -archivePath $CM_BUILD_DIR/build/NanoChatApp.xcarchive \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            PROVISIONING_PROFILE_SPECIFIER=""
+      - name: Package Unsigned Archive to IPA File Format
+        script: |
+          mkdir -p $CM_BUILD_DIR/build/Payload
+          cp -r $CM_BUILD_DIR/build/NanoChatApp.xcarchive/Products/Applications/*.app $CM_BUILD_DIR/build/Payload/
+          cd $CM_BUILD_DIR/build
+          zip -r NanoChatApp.ipa Payload
+    artifacts:
+      - build/*.ipa

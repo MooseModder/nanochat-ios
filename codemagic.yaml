@@ -20,7 +20,7 @@ workflows:
       - name: Build Unsigned Target Archive
         script: |
           xcodebuild archive \
-            -workspace "NanoChatApp.xcworkspace" \
+            -project "NanoChatApp.xcodeproj" \
             -scheme "NanoChatApp" \
             -configuration Release \
             -archivePath $CM_BUILD_DIR/build/NanoChatApp.xcarchive \

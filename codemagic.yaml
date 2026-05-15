@@ -4,7 +4,7 @@ workflows:
     instance_type: mac_mini_m1
     max_build_duration: 30
     environment:
-      xcode: 16.0  # Safe target SDK selection matching iOS 18 baseline
+      xcode: 17.0  # Safe target SDK selection matching iOS 18 baseline
       cocoapods: default
     triggering:
       events:
